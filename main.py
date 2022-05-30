@@ -122,17 +122,18 @@ class Ui_MainWindow(object):
 
     def UploadFile(self):
         fname = QFileDialog.getOpenFileName(None, 'Select File', 'c:\\')
-        item_dir = []
-        item = self.tree.currentItem()
-        if item.text(1) == "folder":
-            item_dir.append(item.text(0))
+        if fname[0] != '':
+            item_dir = []
+            item = self.tree.currentItem()
+            if item.text(1) == "folder":
+                item_dir.append(item.text(0))
 
-        item_dir = self.ParentCheck(item, item_dir)
-        dir = ""
-        for i in range(len(item_dir)):
-            add_dir = "/" + item_dir[len(item_dir) - i - 1]
-            dir += add_dir
-        df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
+            item_dir = self.ParentCheck(item, item_dir)
+            dir = ""
+            for i in range(len(item_dir)):
+                add_dir = "/" + item_dir[len(item_dir) - i - 1]
+                dir += add_dir
+            df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
 
 
 if __name__ == "__main__":
