@@ -11,7 +11,7 @@ class Ui_MainWindow(object):
         global IMG_PATH
         IMG_PATH = ''
         MainWindow.setObjectName("CloudApp")
-        MainWindow.resize(630, 640)  # Pencere boyutu
+        MainWindow.resize(630, 690)  # Pencere boyutu
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -28,7 +28,6 @@ class Ui_MainWindow(object):
         self.tree.setObjectName("tree")
         self.tree.setColumnCount(3)
         self.tree.setHeaderLabels(["Name", "type", "client modified"])
-        self.tree.insertTopLevelItems(0, self.get_tree_item())
         self.tree.setStyleSheet("""
         background-color : rgba(0, 0, 0, 200);
         color: rgb(255,255,255);
@@ -66,6 +65,18 @@ class Ui_MainWindow(object):
         self.uploadButton.setObjectName("run")
         self.uploadButton.clicked.connect(self.UploadFile)
 
+        self.ac_token_label = QLabel(self.centralwidget) #Mod seçme etiketi
+        self.ac_token_label.setGeometry(QRect(20, 620, 130, 40))
+        self.ac_token_label.setObjectName("ac_token_label")
+        font = QFont()
+        font.setPointSize(14)
+        self.ac_token_label.setFont(font)
+
+        self.get_token = QTextEdit(self.centralwidget) #Teknik seçme etiketi
+        self.get_token.setGeometry(QRect(150, 620, 420, 40))
+        self.get_token.setObjectName("get_token")
+        self.get_token.setFont(font)
+
         self.retranslateUi(MainWindow)
         QMetaObject.connectSlotsByName(MainWindow)
 
@@ -74,16 +85,18 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Cloud App"))
         self.downloadButton.setText(_translate("MainWindow", "Download File"))
         self.uploadButton.setText(_translate("MainWindow", "Upload File"))
+        self.ac_token_label.setText(_translate("MainWindow", "Acces Token:"))
 
     def get_tree_item(self):
         self.tree.clear()
-        files, folders = df.dropbox_list_files("")
+        files, folders = df.dropbox_list_files(self.get_token.toPlainText(), "")
         items = funcs.get_child_control(files, folders)
         return items
 
     def Refresh(self):  # Çalıştırma fonksiyonu
         self.tree.clear()
-        files, folders = df.dropbox_list_files("")
+        token = self.get_token.toPlainText()
+        files, folders = df.dropbox_list_files(token, "")
         items = funcs.get_child_control(files, folders)
         self.tree.insertTopLevelItems(0, items)
 
@@ -105,7 +118,7 @@ class Ui_MainWindow(object):
             add_dir = "/" + item_dir[len(item_dir) - i - 1]
             dir += add_dir
         download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
-        df.dropbox_download_file(dir, download_dir)
+        df.dropbox_download_file(self.get_token.toPlainText(), dir, download_dir)
 
     def UploadFile(self):
         fname = QFileDialog.getOpenFileName(None, 'Select File', 'c:\\')
@@ -119,7 +132,8 @@ class Ui_MainWindow(object):
         for i in range(len(item_dir)):
             add_dir = "/" + item_dir[len(item_dir) - i - 1]
             dir += add_dir
-        df.dropbox_upload_file(fname[0], dir)
+        df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
+
 
 if __name__ == "__main__":
     import sys
