@@ -108,7 +108,6 @@ def found_child_folder(items, folder_paths, dir_len):
 
 def folder_check(DIR):
     if not os.path.isdir(DIR):
-        print(DIR.rsplit("/", 1)[0])
         folder_check(DIR.rsplit("/", 1)[0])
         os.mkdir(DIR)
         print("Directory '% s' created" % DIR)
