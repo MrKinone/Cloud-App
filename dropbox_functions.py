@@ -19,7 +19,7 @@ def dropbox_connect(DROPBOX_ACCESS_TOKEN):
 def dropbox_upload_file(DROPBOX_ACCESS_TOKEN, local_file_path, dropbox_file_path):
     enc_local_file_path = encrypt.encrypt_file(local_file_path)
 
-    dropbox_file_path = dropbox_file_path+"/"+enc_local_file_path.rsplit("/", 1)[-1]
+    dropbox_file_path = dropbox_file_path+enc_local_file_path.rsplit("/", 1)[-1]
     print(dropbox_file_path)
 
     enc_local_file_path = pathlib.Path(enc_local_file_path)

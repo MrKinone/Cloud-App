@@ -98,11 +98,15 @@ class Ui_MainWindow(object):
         token = self.get_token.toPlainText()
         files, folders = df.dropbox_list_files(token, "")
         items = funcs.get_child_control(files, folders)
-        self.tree.insertTopLevelItems(0, items)
+        root = QTreeWidgetItem(["/", "root folder"])
+        root.setIcon(0, QIcon('images/dropbox.ico'))
+        for i in range(len(items)):
+            root.addChild(items[i])
+        self.tree.insertTopLevelItem(0, root)
 
     def ParentCheck(self, item, item_dir):
-        if item.parent() is not None:
-            item_dir.append(item.parent().text(0))
+        if (item.parent() is not None) and item.parent().text(1) == "folder":
+            item_dir.append(item.parent().text(0)+"/")
             item_dir = self.ParentCheck(item.parent(), item_dir)
             return item_dir
         else:
@@ -111,11 +115,14 @@ class Ui_MainWindow(object):
     def DownloadFile(self):
         item_dir = []
         item = self.tree.currentItem()
+        if item.text(1) != "file":
+            print("This item not file")
+            return
         item_dir.append(item.text(0))
         item_dir = self.ParentCheck(item, item_dir)
-        dir = ""
+        dir = "/"
         for i in range(len(item_dir)):
-            add_dir = "/" + item_dir[len(item_dir) - i - 1]
+            add_dir = item_dir[len(item_dir) - i - 1]
             dir += add_dir
         download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
         df.dropbox_download_file(self.get_token.toPlainText(), dir, download_dir)
@@ -126,13 +133,11 @@ class Ui_MainWindow(object):
             item_dir = []
             item = self.tree.currentItem()
             if item.text(1) == "folder":
-                item_dir.append(item.text(0))
-
+                item_dir.append(item.text(0)+"/")
             item_dir = self.ParentCheck(item, item_dir)
-            dir = ""
+            dir = "/"
             for i in range(len(item_dir)):
-                add_dir = "/" + item_dir[len(item_dir) - i - 1]
-                dir += add_dir
+                dir += item_dir[len(item_dir) - i - 1]
             df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
 
 
