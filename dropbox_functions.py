@@ -6,7 +6,7 @@ from dropbox.exceptions import AuthError
 
 import funcs
 
-DROPBOX_ACCESS_TOKEN = 'sl.BIkMw6h5iHf949j1Vc03AP3vP7CpLFTE5kKD97yMz289o4D3cZmT2KRqiEDcJyN4qVMHKz_1og4QmBAix2fk5Dq1m-aWKFW5MccCihffm7y4LTOmdr6NOvpCg0iRDhXNdk94hv8'
+DROPBOX_ACCESS_TOKEN = 'Write Token There'
 
 
 def dropbox_connect():
