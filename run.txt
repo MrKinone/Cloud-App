@@ -1,0 +1,1 @@
+pyinstaller.exe --name=CloudApp --icon=App.ico --noconsole main.py
