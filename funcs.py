@@ -156,6 +156,24 @@ def name_convert(str):
                 return names[i][1]
             elif str == names[i][1]:
                 return names[i][0]
-
     except:
         print("file not found")
+
+
+def name_delete(name):
+
+    lines = list()
+
+    imp = open('name.csv', 'r')
+    for row in csv.reader(imp):
+        if len(row)==0:
+            continue
+        elif row[0] == name:
+            continue
+        else:
+            lines.append(row)
+    imp.close()
+
+    with open('name.csv', 'w') as writeFile:
+        for num in range(len(lines)):
+            writeFile.write(lines[num][0]+","+(lines[num][1]+"\n"))
