@@ -3,15 +3,25 @@ import pathlib
 import encrypt, decrypt
 import dropbox
 from dropbox.exceptions import AuthError
+import funcs, requests
 
-import funcs
-
-global DROPBOX_ACCESS_TOKEN
-
+def setToken(authorization_code):
+    app_key = "e1iey9lzp2uu6jq"
+    app_secret = "8ohqk4mtdff1yos"
+    token_url = "https://api.dropboxapi.com/oauth2/token"
+    params = {
+        "code": authorization_code,
+        "grant_type": "authorization_code",
+        "client_id": app_key,
+        "client_secret": app_secret
+    }
+    r = requests.post(token_url, data=params)
+    global DROPBOX_ACCESS_TOKEN
+    DROPBOX_ACCESS_TOKEN = r.text[18:156]
+    print(DROPBOX_ACCESS_TOKEN)
 
 def dropbox_connect():
     """Create a connection to Dropbox."""
-
     try:
         dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
     except AuthError as e:
@@ -86,7 +96,7 @@ def dropbox_list_files(path):
                 folder_list.append(metadata)
         for i in range(len(folder_list)):
             path_display = (folder_list[i]["path_display"])
-            sub_files, sub_folders = dropbox_list_files(DROPBOX_ACCESS_TOKEN, path_display)
+            sub_files, sub_folders = dropbox_list_files(path_display)
 
             if sub_files:
                 for j in range(len(sub_files)):

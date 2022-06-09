@@ -16,7 +16,7 @@ class Ui_MainWindow(object):
         global IMG_PATH
         IMG_PATH = ''
         MainWindow.setObjectName("CloudApp")
-        MainWindow.resize(630, 690)  # Pencere boyutu
+        MainWindow.resize(630, 650)  # Pencere boyutu
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -70,7 +70,6 @@ class Ui_MainWindow(object):
             background-repeat: no-repeat;
         """)
 
-
         self.downloadButton = QPushButton(self.centralwidget)  # Calıştırma butonu
         self.downloadButton.setGeometry(QRect(20, 570, 275, 50))
         self.downloadButton.setObjectName("run")
@@ -81,17 +80,6 @@ class Ui_MainWindow(object):
         self.uploadButton.setObjectName("run")
         self.uploadButton.clicked.connect(self.UploadFile)
 
-        self.ac_token_label = QLabel(self.centralwidget) #Mod seçme etiketi
-        self.ac_token_label.setGeometry(QRect(20, 620, 130, 40))
-        self.ac_token_label.setObjectName("ac_token_label")
-        font = QFont()
-        font.setPointSize(14)
-        self.ac_token_label.setFont(font)
-
-        self.get_token = QTextEdit(self.centralwidget) #Teknik seçme etiketi
-        self.get_token.setGeometry(QRect(150, 620, 420, 40))
-        self.get_token.setObjectName("get_token")
-        self.get_token.setFont(font)
 
         self.retranslateUi(MainWindow)
         QMetaObject.connectSlotsByName(MainWindow)
@@ -101,18 +89,16 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Cloud App"))
         self.downloadButton.setText(_translate("MainWindow", "Download File"))
         self.uploadButton.setText(_translate("MainWindow", "Upload File"))
-        self.ac_token_label.setText(_translate("MainWindow", "Acces Token:"))
 
     def get_tree_item(self):
         self.tree.clear()
-        files, folders = df.dropbox_list_files(self.get_token.toPlainText(), "")
+        files, folders = df.dropbox_list_files("")
         items = funcs.get_child_control(files, folders)
         return items
 
     def Refresh(self):  # Çalıştırma fonksiyonu
         self.tree.clear()
-        token = self.get_token.toPlainText()
-        files, folders = df.dropbox_list_files(token, "")
+        files, folders = df.dropbox_list_files("")
         items = funcs.get_child_control(files, folders)
         root = QTreeWidgetItem(["/", "root folder"])
         root.setIcon(0, QIcon('images/dropbox.ico'))
@@ -141,7 +127,7 @@ class Ui_MainWindow(object):
             add_dir = item_dir[len(item_dir) - i - 1]
             dir += add_dir
         download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
-        df.dropbox_download_file(self.get_token.toPlainText(), dir, download_dir)
+        df.dropbox_download_file(dir, download_dir)
         print("File Downloaded")
 
     def UploadFile(self):
@@ -155,7 +141,7 @@ class Ui_MainWindow(object):
             dir = "/"
             for i in range(len(item_dir)):
                 dir += item_dir[len(item_dir) - i - 1]
-            df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
+            df.dropbox_upload_file(fname[0], dir)
 
     def deleteFile(self):
         item_dir = []
@@ -169,39 +155,52 @@ class Ui_MainWindow(object):
         for i in range(len(item_dir)):
             add_dir = item_dir[len(item_dir) - i - 1]
             dir += add_dir
-        df.dropbox_delete_file(self.get_token.toPlainText(), dir)
+        df.dropbox_delete_file(dir)
 
 
 class SubWindow(QWidget):
     def __init__(self):
         super(SubWindow, self).__init__()
-        self.resize(570, 350)
+        self.resize(550, 200)
         _translate = QCoreApplication.translate
-        self.setWindowTitle(_translate("SubWindow", "Get Acces Code"))
+        self.setWindowTitle(_translate("SubWindow", "Get Access Code"))
         # Label
         self.label = QLabel(self)
-        self.label.setGeometry(10, 10, 550, 50)
-        self.label.setFont(QFont('Arial', 15))
-        self.label.setText('Please click the connect and enter generated acces code')
+        self.label.setGeometry(30, 10, 530, 50)
+        self.label.setFont(QFont('Arial', 13))
+        self.label.setText('Please click the get access code and enter generated access code')
 
         #Label2
-        cl_button = QCommandLinkButton("Connect", self)
-        cl_button.setGeometry(10, 60, 550, 50)
-        cl_button.clicked.connect(self.yazdir)
+        cl_button = QCommandLinkButton("Get Access Code", self)
+        cl_button.setGeometry(30, 60, 160, 50)
+        cl_button.clicked.connect(self.openBrowser)
 
         #TextEdit
         self.acc_code = QTextEdit(self)  # Kullanıcıdan alınan şifreleme anahtarı
-        self.acc_code.setGeometry(QRect(70, 120, 405, 30))
+        self.acc_code.setGeometry(QRect(200, 60, 320, 50))
         self.acc_code.setFont(QFont('Arial', 13))
-        self.acc_code.setPlaceholderText(_translate("SubWindow","Enter Acces code here"))
+        self.acc_code.setPlaceholderText(_translate("SubWindow","Enter Access code here"))
 
+        #Connect_Button
+        self.Connect = QPushButton(self)  # Fotoğraf seçme butonu
+        self.Connect.setGeometry(QRect(30, 120, 490, 50))
+        self.Connect.setText(_translate("SubWindow", "Connect"))
+        self.Connect.setFont(QFont('Arial', 20))
+        self.Connect.clicked.connect(self.getToken)
 
-
-    def yazdir(self):
+    def openBrowser(self):
         app_key = "e1iey9lzp2uu6jq"
         authorization_url = "https://www.dropbox.com/oauth2/authorize?client_id=%s&response_type=code" % app_key
         webbrowser.open(authorization_url)
 
+
+    def getToken(self):
+        try:
+            authorization_code = self.acc_code.toPlainText()
+            df.setToken(authorization_code)
+            self.close()
+        except:
+            print("Error")
 
 if __name__ == "__main__":
     import sys
