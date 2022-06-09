@@ -3,11 +3,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import dropbox_functions as df
 import funcs
-
+import webbrowser
 
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
+
+        self.sub_window = SubWindow()
+        self.sub_window.show()
+        app.exec_()
+
         global IMG_PATH
         IMG_PATH = ''
         MainWindow.setObjectName("CloudApp")
@@ -54,6 +59,17 @@ class Ui_MainWindow(object):
             background-position: center;
             background-repeat: no-repeat;
         """)
+
+        self.deleteButton = QPushButton(self.centralwidget)  # Calıştırma butonu
+        self.deleteButton.setGeometry(QRect(575, 65, 40, 40))
+        self.deleteButton.setObjectName("run")
+        self.deleteButton.clicked.connect(self.deleteFile)
+        self.deleteButton.setStyleSheet("""
+            background-image: url(images/trash.ico);
+            background-position: center;
+            background-repeat: no-repeat;
+        """)
+
 
         self.downloadButton = QPushButton(self.centralwidget)  # Calıştırma butonu
         self.downloadButton.setGeometry(QRect(20, 570, 275, 50))
@@ -126,6 +142,7 @@ class Ui_MainWindow(object):
             dir += add_dir
         download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
         df.dropbox_download_file(self.get_token.toPlainText(), dir, download_dir)
+        print("File Downloaded")
 
     def UploadFile(self):
         fname = QFileDialog.getOpenFileName(None, 'Select File', 'c:\\')
@@ -139,6 +156,51 @@ class Ui_MainWindow(object):
             for i in range(len(item_dir)):
                 dir += item_dir[len(item_dir) - i - 1]
             df.dropbox_upload_file(self.get_token.toPlainText(), fname[0], dir)
+
+    def deleteFile(self):
+        item_dir = []
+        item = self.tree.currentItem()
+        if item.text(1) != "file":
+            print("This item not file")
+            return
+        item_dir.append(item.text(0))
+        item_dir = self.ParentCheck(item, item_dir)
+        dir = "/"
+        for i in range(len(item_dir)):
+            add_dir = item_dir[len(item_dir) - i - 1]
+            dir += add_dir
+        df.dropbox_delete_file(self.get_token.toPlainText(), dir)
+
+
+class SubWindow(QWidget):
+    def __init__(self):
+        super(SubWindow, self).__init__()
+        self.resize(570, 350)
+        _translate = QCoreApplication.translate
+        self.setWindowTitle(_translate("SubWindow", "Get Acces Code"))
+        # Label
+        self.label = QLabel(self)
+        self.label.setGeometry(10, 10, 550, 50)
+        self.label.setFont(QFont('Arial', 15))
+        self.label.setText('Please click the connect and enter generated acces code')
+
+        #Label2
+        cl_button = QCommandLinkButton("Connect", self)
+        cl_button.setGeometry(10, 60, 550, 50)
+        cl_button.clicked.connect(self.yazdir)
+
+        #TextEdit
+        self.acc_code = QTextEdit(self)  # Kullanıcıdan alınan şifreleme anahtarı
+        self.acc_code.setGeometry(QRect(70, 120, 405, 30))
+        self.acc_code.setFont(QFont('Arial', 13))
+        self.acc_code.setPlaceholderText(_translate("SubWindow","Enter Acces code here"))
+
+
+
+    def yazdir(self):
+        app_key = "e1iey9lzp2uu6jq"
+        authorization_url = "https://www.dropbox.com/oauth2/authorize?client_id=%s&response_type=code" % app_key
+        webbrowser.open(authorization_url)
 
 
 if __name__ == "__main__":

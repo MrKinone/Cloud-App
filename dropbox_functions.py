@@ -6,7 +6,10 @@ from dropbox.exceptions import AuthError
 
 import funcs
 
-def dropbox_connect(DROPBOX_ACCESS_TOKEN):
+global DROPBOX_ACCESS_TOKEN
+
+
+def dropbox_connect():
     """Create a connection to Dropbox."""
 
     try:
@@ -16,16 +19,16 @@ def dropbox_connect(DROPBOX_ACCESS_TOKEN):
     return dbx
 
 
-def dropbox_upload_file(DROPBOX_ACCESS_TOKEN, local_file_path, dropbox_file_path):
+def dropbox_upload_file(local_file_path, dropbox_file_path):
     enc_local_file_path = encrypt.encrypt_file(local_file_path)
 
-    dropbox_file_path = dropbox_file_path+enc_local_file_path.rsplit("/", 1)[-1]
+    dropbox_file_path = dropbox_file_path + enc_local_file_path.rsplit("/", 1)[-1]
     print(dropbox_file_path)
 
     enc_local_file_path = pathlib.Path(enc_local_file_path)
 
     try:
-        dbx = dropbox_connect(DROPBOX_ACCESS_TOKEN)
+        dbx = dropbox_connect()
 
         with enc_local_file_path.open("rb") as f:
             meta = dbx.files_upload(f.read(), dropbox_file_path, mode=dropbox.files.WriteMode("overwrite"))
@@ -37,14 +40,14 @@ def dropbox_upload_file(DROPBOX_ACCESS_TOKEN, local_file_path, dropbox_file_path
         print('Error uploading file to Dropbox: ' + str(e))
 
 
-def dropbox_download_file(DROPBOX_ACCESS_TOKEN, dropbox_file_path, local_file_path):  # 22-05-2022
+def dropbox_download_file(dropbox_file_path, local_file_path):  # 22-05-2022
 
     funcs.folder_check(local_file_path)
     name = funcs.name_convert(dropbox_file_path.rsplit('/', 1)[-1])
-    enc_local_file_path = local_file_path +"/"+name
-    dropbox_file_path=dropbox_file_path.rsplit("/",1)[0]+"/"+name
+    enc_local_file_path = local_file_path + "/" + name
+    dropbox_file_path = dropbox_file_path.rsplit("/", 1)[0] + "/" + name
     try:
-        dbx = dropbox_connect(DROPBOX_ACCESS_TOKEN)
+        dbx = dropbox_connect()
 
         with open(enc_local_file_path, "wb") as f:
             metadata, res = dbx.files_download(path=dropbox_file_path)
@@ -59,9 +62,8 @@ def dropbox_download_file(DROPBOX_ACCESS_TOKEN, dropbox_file_path, local_file_pa
     os.remove(enc_local_file_path)
 
 
-def dropbox_list_files(DROPBOX_ACCESS_TOKEN, path):
-
-    dbx = dropbox_connect(DROPBOX_ACCESS_TOKEN)
+def dropbox_list_files(path):
+    dbx = dropbox_connect()
 
     try:
         files = dbx.files_list_folder(path).entries
@@ -84,7 +86,7 @@ def dropbox_list_files(DROPBOX_ACCESS_TOKEN, path):
                 folder_list.append(metadata)
         for i in range(len(folder_list)):
             path_display = (folder_list[i]["path_display"])
-            sub_files, sub_folders = dropbox_list_files(DROPBOX_ACCESS_TOKEN,path_display)
+            sub_files, sub_folders = dropbox_list_files(DROPBOX_ACCESS_TOKEN, path_display)
 
             if sub_files:
                 for j in range(len(sub_files)):
@@ -99,12 +101,11 @@ def dropbox_list_files(DROPBOX_ACCESS_TOKEN, path):
         print('Error getting list of files from Dropbox: ' + str(e))
 
 
-
-def dropbox_delete_file(DROPBOX_ACCESS_TOKEN, dropbox_file_path):  # 22-05-2022
+def dropbox_delete_file(dropbox_file_path):  # 22-05-2022
     name = funcs.name_convert(dropbox_file_path.rsplit('/', 1)[-1])
     dropbox_file_path = dropbox_file_path.rsplit("/", 1)[0] + "/" + name
     try:
-        dbx = dropbox_connect(DROPBOX_ACCESS_TOKEN)
+        dbx = dropbox_connect()
         dbx.files_delete(dropbox_file_path)
         funcs.name_delete(name)
     except Exception as e:
