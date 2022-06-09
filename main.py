@@ -40,6 +40,7 @@ class Ui_MainWindow(object):
         palette = QPalette()
         palette.setColor(QPalette.Text, QColor(0, 0, 0))
         self.tree.header().setPalette(palette)
+        self.Refresh()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -80,7 +81,6 @@ class Ui_MainWindow(object):
         self.uploadButton.setObjectName("run")
         self.uploadButton.clicked.connect(self.UploadFile)
 
-
         self.retranslateUi(MainWindow)
         QMetaObject.connectSlotsByName(MainWindow)
 
@@ -91,72 +91,121 @@ class Ui_MainWindow(object):
         self.uploadButton.setText(_translate("MainWindow", "Upload File"))
 
     def get_tree_item(self):
-        self.tree.clear()
-        files, folders = df.dropbox_list_files("")
-        items = funcs.get_child_control(files, folders)
-        return items
+        try:
+            self.tree.clear()
+            files, folders = df.dropbox_list_files("")
+            items = funcs.get_child_control(files, folders)
+            return items
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def Refresh(self):  # Çalıştırma fonksiyonu
-        self.tree.clear()
-        files, folders = df.dropbox_list_files("")
-        items = funcs.get_child_control(files, folders)
-        root = QTreeWidgetItem(["/", "root folder"])
-        root.setIcon(0, QIcon('images/dropbox.ico'))
-        for i in range(len(items)):
-            root.addChild(items[i])
-        self.tree.insertTopLevelItem(0, root)
+        try:
+            self.tree.clear()
+            files, folders = df.dropbox_list_files("")
+            print(files)
+            print(folders)
+            items = funcs.get_child_control(files, folders)
+            root = QTreeWidgetItem(["/", "root folder"])
+            root.setIcon(0, QIcon('images/dropbox.ico'))
+            for i in range(len(items)):
+                root.addChild(items[i])
+            self.tree.insertTopLevelItem(0, root)
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def ParentCheck(self, item, item_dir):
-        if (item.parent() is not None) and item.parent().text(1) == "folder":
-            item_dir.append(item.parent().text(0)+"/")
-            item_dir = self.ParentCheck(item.parent(), item_dir)
-            return item_dir
-        else:
-            return item_dir
+        try:
+            if (item.parent() is not None) and item.parent().text(1) == "folder":
+                item_dir.append(item.parent().text(0)+"/")
+                item_dir = self.ParentCheck(item.parent(), item_dir)
+                return item_dir
+            else:
+                return item_dir
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def DownloadFile(self):
-        item_dir = []
-        item = self.tree.currentItem()
-        if item.text(1) != "file":
-            print("This item not file")
-            return
-        item_dir.append(item.text(0))
-        item_dir = self.ParentCheck(item, item_dir)
-        dir = "/"
-        for i in range(len(item_dir)):
-            add_dir = item_dir[len(item_dir) - i - 1]
-            dir += add_dir
-        download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
-        df.dropbox_download_file(dir, download_dir)
-        print("File Downloaded")
-
-    def UploadFile(self):
-        fname = QFileDialog.getOpenFileName(None, 'Select File', 'c:\\')
-        if fname[0] != '':
+        try:
             item_dir = []
             item = self.tree.currentItem()
-            if item.text(1) == "folder":
-                item_dir.append(item.text(0)+"/")
+            if item.text(1) != "file":
+                print("This item not file")
+                return
+            item_dir.append(item.text(0))
             item_dir = self.ParentCheck(item, item_dir)
             dir = "/"
             for i in range(len(item_dir)):
-                dir += item_dir[len(item_dir) - i - 1]
-            df.dropbox_upload_file(fname[0], dir)
+                add_dir = item_dir[len(item_dir) - i - 1]
+                dir += add_dir
+            download_dir = r"C:/CloudApp" + dir.rsplit('/', 1)[0]
+            df.dropbox_download_file(dir, download_dir)
+            print("File Downloaded")
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
+
+    def UploadFile(self):
+        try:
+            fname = QFileDialog.getOpenFileName(None, 'Select File', 'c:\\')
+            if fname[0] != '':
+                item_dir = []
+                item = self.tree.currentItem()
+                if item.text(1) == "folder":
+                    item_dir.append(item.text(0)+"/")
+                item_dir = self.ParentCheck(item, item_dir)
+                dir = "/"
+                for i in range(len(item_dir)):
+                    dir += item_dir[len(item_dir) - i - 1]
+                df.dropbox_upload_file(fname[0], dir)
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def deleteFile(self):
-        item_dir = []
-        item = self.tree.currentItem()
-        if item.text(1) != "file":
-            print("This item not file")
-            return
-        item_dir.append(item.text(0))
-        item_dir = self.ParentCheck(item, item_dir)
-        dir = "/"
-        for i in range(len(item_dir)):
-            add_dir = item_dir[len(item_dir) - i - 1]
-            dir += add_dir
-        df.dropbox_delete_file(dir)
-
+        try:
+            item_dir = []
+            item = self.tree.currentItem()
+            if item.text(1) != "file":
+                print("This item not file")
+                return
+            item_dir.append(item.text(0))
+            item_dir = self.ParentCheck(item, item_dir)
+            dir = "/"
+            for i in range(len(item_dir)):
+                add_dir = item_dir[len(item_dir) - i - 1]
+                dir += add_dir
+            df.dropbox_delete_file(dir)
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
 class SubWindow(QWidget):
     def __init__(self):
@@ -189,18 +238,30 @@ class SubWindow(QWidget):
         self.Connect.clicked.connect(self.getToken)
 
     def openBrowser(self):
-        app_key = "e1iey9lzp2uu6jq"
-        authorization_url = "https://www.dropbox.com/oauth2/authorize?client_id=%s&response_type=code" % app_key
-        webbrowser.open(authorization_url)
-
+        try:
+            app_key = "e1iey9lzp2uu6jq"
+            authorization_url = "https://www.dropbox.com/oauth2/authorize?client_id=%s&response_type=code" % app_key
+            webbrowser.open(authorization_url)
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def getToken(self):
         try:
             authorization_code = self.acc_code.toPlainText()
             df.setToken(authorization_code)
             self.close()
-        except:
-            print("Error")
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
 if __name__ == "__main__":
     import sys

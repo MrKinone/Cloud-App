@@ -75,48 +75,45 @@ def dropbox_download_file(dropbox_file_path, local_file_path):  # 22-05-2022
 def dropbox_list_files(path):
     dbx = dropbox_connect()
 
-    try:
-        files = dbx.files_list_folder(path).entries
-        files_list = []
-        folder_list = []
-        for file in files:
-            if isinstance(file, dropbox.files.FileMetadata):
-                metadata = {
-                    'name': file.name,
-                    'path_display': file.path_display,
-                    'client_modified': file.client_modified,
-                    'server_modified': file.server_modified
-                }
-                files_list.append(metadata)
-            else:
-                metadata = {
-                    'name': file.name,
-                    'path_display': file.path_display
-                }
-                folder_list.append(metadata)
-        for i in range(len(folder_list)):
-            path_display = (folder_list[i]["path_display"])
-            sub_files, sub_folders = dropbox_list_files(path_display)
+    files = dbx.files_list_folder(path).entries
+    files_list = []
+    folder_list = []
+    for file in files:
+        if isinstance(file, dropbox.files.FileMetadata):
+            metadata = {
+                'name': file.name,
+                'path_display': file.path_display,
+                'client_modified': file.client_modified,
+                'server_modified': file.server_modified
+            }
+            files_list.append(metadata)
+        else:
+            metadata = {
+                'name': file.name,
+                'path_display': file.path_display
+            }
+            folder_list.append(metadata)
+    for i in range(len(folder_list)):
+        path_display = (folder_list[i]["path_display"])
+        sub_files, sub_folders = dropbox_list_files(path_display)
 
-            if sub_files:
-                for j in range(len(sub_files)):
-                    files_list.append(sub_files[j])
+        if sub_files:
+            for j in range(len(sub_files)):
+                files_list.append(sub_files[j])
 
-            if sub_folders:
-                for j in range(len(sub_folders)):
-                    folder_list.append(sub_folders[j])
+        if sub_folders:
+            for j in range(len(sub_folders)):
+                folder_list.append(sub_folders[j])
 
-        return files_list, folder_list
-    except Exception as e:
-        print('Error getting list of files from Dropbox: ' + str(e))
+    return files_list, folder_list
+
 
 
 def dropbox_delete_file(dropbox_file_path):  # 22-05-2022
     name = funcs.name_convert(dropbox_file_path.rsplit('/', 1)[-1])
     dropbox_file_path = dropbox_file_path.rsplit("/", 1)[0] + "/" + name
-    try:
-        dbx = dropbox_connect()
-        dbx.files_delete(dropbox_file_path)
-        funcs.name_delete(name)
-    except Exception as e:
-        print('Error deleting file from Dropbox: ' + str(e))
+
+    dbx = dropbox_connect()
+    dbx.files_delete(dropbox_file_path)
+    funcs.name_delete(name)
+

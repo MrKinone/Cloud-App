@@ -26,7 +26,9 @@ def get_child_control(files, folders):
     folder_paths = get_path(folders)
     client_modified_list = get_client_modified(files)
     while True:
-        if 1 == len(folder_paths[0]):
+        if not folder_paths:
+            break
+        elif 1 == len(folder_paths[0]):
             item = QTreeWidgetItem([folder_paths[0][0], "folder"])
             folder_paths.remove(folder_paths[0])
             item.setIcon(0, QIcon('images/folder.ico'))
@@ -35,8 +37,7 @@ def get_child_control(files, folders):
             dir_len = len(folder_paths[0])
             items = found_child_folder(items, folder_paths[0], dir_len)
             folder_paths.remove(folder_paths[0])
-        if not folder_paths:
-            break
+
 
 
     while True:
