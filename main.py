@@ -40,6 +40,8 @@ class Ui_MainWindow(object):
         palette = QPalette()
         palette.setColor(QPalette.Text, QColor(0, 0, 0))
         self.tree.header().setPalette(palette)
+        self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tree.customContextMenuRequested.connect(self._show_context_menu)
         self.Refresh()
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -84,11 +86,36 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QMetaObject.connectSlotsByName(MainWindow)
 
+    def keyPressEvent(self, qKeyEvent):
+        print(qKeyEvent.key())
+        if qKeyEvent.key() == QtCore.Qt.Key_Return:
+            print('Enter pressed')
+        else:
+            super().keyPressEvent(qKeyEvent)
+
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Cloud App"))
         self.downloadButton.setText(_translate("MainWindow", "Download File"))
         self.uploadButton.setText(_translate("MainWindow", "Upload File"))
+
+    def _show_context_menu(self, position):
+        try:
+            display_action1 = QAction("Download")
+            display_action2 = QAction("Delete")
+            display_action1.triggered.connect(self.DownloadFile)
+            display_action2.triggered.connect(self.deleteFile)
+            menu = QMenu(self.tree)
+            menu.addAction(display_action1)
+            menu.addAction(display_action2)
+            menu.exec_(self.tree.mapToGlobal(position))
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def get_tree_item(self):
         try:
@@ -104,12 +131,11 @@ class Ui_MainWindow(object):
             msg.setWindowTitle("Error")
             msg.exec_()
 
+
     def Refresh(self):  # Çalıştırma fonksiyonu
         try:
             self.tree.clear()
             files, folders = df.dropbox_list_files("")
-            print(files)
-            print(folders)
             items = funcs.get_child_control(files, folders)
             root = QTreeWidgetItem(["/", "root folder"])
             root.setIcon(0, QIcon('images/dropbox.ico'))

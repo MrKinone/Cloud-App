@@ -31,7 +31,7 @@ def encrypt_file(in_filename):
                     chunk = chunk + bytes(empty, 'utf-8')
                 outfile.write(encryptor.encrypt(chunk))
 
-    with open('name.csv', 'w') as writeFile:
+    with open('name.csv', 'a') as writeFile:
         writeFile.write(csv_name[0]+","+csv_name[1]+"\n")
 
     return outfile_dir

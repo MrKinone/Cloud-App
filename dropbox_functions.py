@@ -18,7 +18,6 @@ def setToken(authorization_code):
     r = requests.post(token_url, data=params)
     global DROPBOX_ACCESS_TOKEN
     DROPBOX_ACCESS_TOKEN = r.text[18:156]
-    print(DROPBOX_ACCESS_TOKEN)
 
 def dropbox_connect():
     """Create a connection to Dropbox."""
@@ -108,7 +107,6 @@ def dropbox_list_files(path):
     return files_list, folder_list
 
 
-
 def dropbox_delete_file(dropbox_file_path):  # 22-05-2022
     name = funcs.name_convert(dropbox_file_path.rsplit('/', 1)[-1])
     dropbox_file_path = dropbox_file_path.rsplit("/", 1)[0] + "/" + name
@@ -117,3 +115,6 @@ def dropbox_delete_file(dropbox_file_path):  # 22-05-2022
     dbx.files_delete(dropbox_file_path)
     funcs.name_delete(name)
 
+def dropbox_create_folder(dropbox_folder_path):
+    dbx = dropbox_connect()
+    dbx.files_create_folder_v2(dropbox_folder_path)
