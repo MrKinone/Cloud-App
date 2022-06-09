@@ -97,3 +97,15 @@ def dropbox_list_files(DROPBOX_ACCESS_TOKEN, path):
         return files_list, folder_list
     except Exception as e:
         print('Error getting list of files from Dropbox: ' + str(e))
+
+
+
+def dropbox_delete_file(DROPBOX_ACCESS_TOKEN, dropbox_file_path):  # 22-05-2022
+    name = funcs.name_convert(dropbox_file_path.rsplit('/', 1)[-1])
+    dropbox_file_path = dropbox_file_path.rsplit("/", 1)[0] + "/" + name
+    try:
+        dbx = dropbox_connect(DROPBOX_ACCESS_TOKEN)
+        dbx.files_delete(dropbox_file_path)
+        funcs.name_delete(name)
+    except Exception as e:
+        print('Error deleting file from Dropbox: ' + str(e))
