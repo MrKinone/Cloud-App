@@ -17,7 +17,8 @@ def setToken(authorization_code):
     }
     r = requests.post(token_url, data=params)
     global DROPBOX_ACCESS_TOKEN
-    DROPBOX_ACCESS_TOKEN = r.text[18:156]
+    DROPBOX_ACCESS_TOKEN = r.text[18:161]
+    print(r.text)
 
 def dropbox_connect():
     """Create a connection to Dropbox."""
@@ -118,3 +119,42 @@ def dropbox_delete_file(dropbox_file_path):  # 22-05-2022
 def dropbox_create_folder(dropbox_folder_path):
     dbx = dropbox_connect()
     dbx.files_create_folder_v2(dropbox_folder_path)
+    
+    
+def retry_sharing_job(async_job_id):
+    dbx = dropbox_connect()
+    sharing_job = dbx.sharing_check_share_job_status(async_job_id)
+    if sharing_job.is_complete():
+        print("Async sharing job completed...")
+        pass
+    else:
+        print("Async sharing job in progress")
+        print("....waiting 3 seconds...")
+        time.sleep(3)
+        retry_sharing_job(async_job_id)
+#
+def creating_shared_folder(folder_path, access_level, email, message):
+    dbx = dropbox_connect()
+    dbx.files_create_folder(folder_path)
+    # sharing_folder = dbx.sharing_share_folder(folder_path, force_async=True)
+    sharing_folder = dbx.sharing_share_folder(folder_path)
+    if sharing_folder.is_complete():
+        sharing_folder_data = sharing_folder.get_complete()
+    if sharing_folder.is_async_job_id():
+        async_job_id = sharing_folder.get_async_job_id()
+        # helper function will block until async sharing job completes
+        retry_sharing_job(async_job_id)
+        sharing_folder_job = dbx.sharing_check_share_job_status(async_job_id)
+        sharing_folder_data = sharing_folder_job.get_complete()
+
+    member = dropbox.sharing.MemberSelector.email(email)
+    add_member = dropbox.sharing.AddMember(member, access_level)
+    members = [add_member]
+    dbx.sharing_add_folder_member(sharing_folder_data.shared_folder_id, members, custom_message=message)
+    print(f"Folder successfully created and shared with {email}.")
+
+def getusermail():
+    dbx = dropbox_connect()
+    account = dbx.users_get_current_account()
+    print(account.email)
+    return account.email

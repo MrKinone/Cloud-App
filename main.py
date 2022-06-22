@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import dropbox_functions as df
+import share
 import funcs
 import webbrowser
 
@@ -72,6 +73,16 @@ class Ui_MainWindow(object):
             background-position: center;
             background-repeat: no-repeat;
         """)
+
+        self.addFirend = QPushButton(self.centralwidget)  # Calıştırma butonu
+        self.addFirend.setGeometry(QRect(575, 110, 40, 40))
+        self.addFirend.setObjectName("run")
+        self.addFirend.clicked.connect(self.shareFile)
+        self.addFirend.setStyleSheet("""
+                    background-image: url(images/share.ico);
+                    background-position: center;
+                    background-repeat: no-repeat;
+                """)
 
         self.downloadButton = QPushButton(self.centralwidget)  # Calıştırma butonu
         self.downloadButton.setGeometry(QRect(20, 570, 275, 50))
@@ -233,6 +244,11 @@ class Ui_MainWindow(object):
             msg.setWindowTitle("Error")
             msg.exec_()
 
+    def shareFile(self):
+        self.sub_window = share.SubWindowshare()
+        self.sub_window.show()
+        app.exec_()
+
 class SubWindow(QWidget):
     def __init__(self):
         super(SubWindow, self).__init__()
@@ -288,6 +304,8 @@ class SubWindow(QWidget):
             msg.setInformativeText(str(e))
             msg.setWindowTitle("Error")
             msg.exec_()
+
+
 
 if __name__ == "__main__":
     import sys
