@@ -17,13 +17,13 @@ Kaynak kodlar ana dizinde bulunan python kodlarıdır. (Kaynak kodları görünt
 
 Geliştirilen uygulamanın ana ekran görüntüsü
 
-![alt text](https://github.com/MrKinone/GUVENLIK-ODEV/blob/main/images/4Github/Screenshot.jpg?raw=true)
+![alt text](https://github.com/MrKinone/Cloud-App/blob/main/images/Screenshot.jpg?raw=true)
 
 ## Video
 
 Uygulamanın nasıl çalıştığını gösteren bir video (Videonun üstüne tıklayınız)
 
-[![IMAGE ALT TEXT HERE](https://github.com/MrKinone/GUVENLIK-ODEV/blob/main/images/4Github/Screenshot_video.jpg?raw=true)](https://youtu.be/eB9cFybQQnk)
+[![IMAGE ALT TEXT HERE](https://github.com/MrKinone/Cloud-App/blob/main/images/Screenshot_video.jpg?raw=true)](https://youtu.be/eB9cFybQQnk)
 
 Yazarlar:
 - Oktay Kaan Memiş
