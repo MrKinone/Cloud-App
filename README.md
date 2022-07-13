@@ -23,7 +23,7 @@ Geliştirilen uygulamanın ana ekran görüntüsü
 
 Uygulamanın nasıl çalıştığını gösteren bir video (Videonun üstüne tıklayınız)
 
-[![IMAGE ALT TEXT HERE](https://github.com/MrKinone/Cloud-App/blob/main/images/Screenshot_video.jpg?raw=true)](https://youtu.be/eB9cFybQQnk)
+[![IMAGE ALT TEXT HERE](https://github.com/MrKinone/Cloud-App/blob/master/images/Screenshot_video.jpg?raw=true)](https://youtu.be/eB9cFybQQnk)
 
 Yazarlar:
 - Oktay Kaan Memiş
