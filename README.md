@@ -17,7 +17,7 @@ Kaynak kodlar ana dizinde bulunan python kodlarıdır. (Kaynak kodları görünt
 
 Geliştirilen uygulamanın ana ekran görüntüsü
 
-![alt text](https://github.com/MrKinone/Cloud-App/blob/main/images/Screenshot.jpg?raw=true)
+![alt text](https://github.com/MrKinone/Cloud-App/blob/master/images/Screenshot.jpg?raw=true)
 
 ## Video
 
